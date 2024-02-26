@@ -1,0 +1,114 @@
+C:\Windows\System32\drivers\etc\hosts
+
+172.19.46.41
+
+172.21.53.48
+
+172.21.49.188
+
+172.21.55.136
+
+172.21.49.188
+
+172.24.164.54
+172.24.173.9
+172.24.174.207
+172.24.175.104
+
+172.30.15.196
+
+172.26.199.89
+
+192.168.160.129
+
+docker container run \
+  -d \
+  --name wordpressdb \
+  --env MYSQL_ROOT_PASSWORD=123456 \
+  --env MYSQL_DATABASE=wordpress \
+  --network wordpressnw \
+  mysql:5.7
+
+docker container run \
+  --name wordpress \
+  --volume "$PWD/":/var/www/html \
+  --link wordpressdb:mysql \
+  phpwithmysql
+
+docker container run \
+  -d \
+  --name wordpressdb2a \
+  --env MYSQL_ROOT_PASSWORD=123456 \
+  --env MYSQL_DATABASE=wordpress \
+  --network wordpressnw2 \
+  mysql:5.7
+
+docker container run \
+  -d \
+  -p 127.0.0.2:8080:80 \
+  --name wordpress2 \
+  --env WORDPRESS_DB_PASSWORD=123456 \
+  --link wordpressdb2:mysql \
+  --volume "$PWD/wordpress2":/var/www/html \
+  wordpress
+
+docker run \
+  -d \
+  -p 127.0.0.2:8080:80 \
+  --name wordpress2 \
+  --env WORDPRESS_DB_HOST=wordpressdb2 \
+  --env WORDPRESS_DB_USER=root \
+  --env WORDPRESS_DB_PASSWORD=123456 \
+  --env WORDPRESS_DB_NAME=wordpress \
+  --link wordpressdb2 \
+  wordpress
+
+docker run \
+  -d \
+  -p 8080:80 \
+  --name wordpress2a \
+  --env WORDPRESS_DB_HOST=wordpressdb2a \
+  --env WORDPRESS_DB_USER=root \
+  --env WORDPRESS_DB_PASSWORD=123456 \
+  --env WORDPRESS_DB_NAME=wordpress \
+  --network wordpressnw2 \
+  wordpress
+
+podman run \
+  -d \
+  --name wordpressdb1 \
+  --env MYSQL_ROOT_PASSWORD=123456 \
+  --env MYSQL_DATABASE=wordpress \
+  --network wordpressnw1 \
+  mysql:5.7
+
+podman run \
+  -d \
+  --name wordpress1 \
+  -p 0.0.0.0:8080:80/tcp \
+  --volume wordpressvol1:/var/www/html \
+  --network wordpressnw1 \
+  phpwithmysql
+
+docker run \
+  -d \
+  --name wordpressdb1 \
+  --env MYSQL_ROOT_PASSWORD=123456 \
+  --env MYSQL_DATABASE=wordpress \
+  --network wordpressnw1 \
+  mysql:5.7
+
+docker run \
+  -d \
+  --name wordpress1 \
+  -p 8080:80 \
+  --volume "$PWD/":/var/www/html \
+  --network wordpressnw1 \
+  phpwithmysql
+
+firewall-cmd --zone=public --add-port=8080/tcp --permanent
+firewall-cmd --zone=public --query-port=8080/tcp
+firewall-cmd --reload
+firewall-cmd --zone=public --list-ports
+
+
